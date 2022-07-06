@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Documents/dev/Lime/contracts/constructor.sol": "c"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Documents/dev/Lime/contracts/constructor.sol": {
+			"keccak256": "0x20aef46f3074e9d33eb5e5a7652f292b0689058f4b0c19af8f374fac8768fb71",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1240cafb637d1594696b501d3a219475ae2c196ddb55a26fe19c872287034cdc",
+				"dweb:/ipfs/QmP6QUNkVX4QkqqgUE3Lgfp7mHD1mgWqkww4f6Svg5y7xS"
+			]
+		}
+	},
+	"version": 1
+}

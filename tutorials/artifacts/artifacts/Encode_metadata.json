@@ -1,0 +1,94 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "t1",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "t2",
+						"type": "string"
+					}
+				],
+				"name": "encode",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "t1",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "t2",
+						"type": "string"
+					}
+				],
+				"name": "encodePacked",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"artifacts/Encode.sol": "Encode"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"artifacts/Encode.sol": {
+			"keccak256": "0x00be7b68005f32464e710ede4c1949e471ac475ca8001bfa4ad190fd3e84656c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0555e8608903de66a5713db6381987270733829060461d20d6704c3e4441c5ca",
+				"dweb:/ipfs/QmTu9rB4kzg5PXejfF4fwcUGgmYFMgGwLgSuuSp7Sb9rLc"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,95 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "getModifier",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "d1",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "d2",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "d3",
+						"type": "address"
+					}
+				],
+				"name": "set",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "m",
+						"type": "uint256"
+					}
+				],
+				"name": "setModifier",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"ChangeVarsWithDelegate.sol": "Updated"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"ChangeVarsWithDelegate.sol": {
+			"keccak256": "0xa7882d8c7f5778aad1ce55ddf5833c7a01b02d4384c18469c2bfd7f0ee354f53",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://823ccf6eed3f4e4b4f5925fc0ccc946b42305ed46c5e1b3e05007ab346e336d0",
+				"dweb:/ipfs/Qmbv5MhtCmaEqXgwysEfGJ35NqeojbNpZVBSHSS6x2zSt4"
+			]
+		}
+	},
+	"version": 1
+}
