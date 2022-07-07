@@ -15,9 +15,7 @@ contract Library is Ownable {
         uint256 copies;
     }
 
-    // constructor() {
-    //     owner = msg.sender;
-    // }
+    constructor() Ownable() {}
 
     //user => current borrowing book index
     mapping(address => uint256) public currentlyBorrowing;
@@ -27,11 +25,6 @@ contract Library is Ownable {
     mapping(uint256 => Book) public books;
     //bookIndex => previous borrowers
     mapping(uint256 => mapping(address => bool)) borrowedBooks;
-
-    // modifier onlyAdmin() {
-    //     require(msg.sender == owner, "not owner");
-    //     _;
-    // }
 
     function addBook(string calldata _name, uint256 _copies)
         external
