@@ -198,7 +198,28 @@ describe("Library", function () {
     };
     expect(err).to.equal(true);
   });
+  it("Multiple users trying to borrow",async function(){
+    const [_owner, addr1, addr2] = await ethers.getSigners();
+    const Library = await ethers.getContractFactory("Library");
+    const library = await Library.deploy();
+    await library.deployed();
 
+    const addBook = await library.connect(_owner).addBook("1984",2);
+    await addBook.wait();
+    var err= false;
+    
+    var borrowBook = await library.borrowBook(1);
+    await borrowBook.wait();
+    borrowBook = await library.connect(addr1).borrowBook(1);
+    await borrowBook.wait();
 
-
+    try{
+      borrowBook = await library.connect(addr2).borrowBook(1);
+      await borrowBook.wait();
+    }catch(error){
+      err=true;
+      expect(error.name).to.equals("Error");
+    };
+    expect(err).to.equal(true);
+  });
 });
