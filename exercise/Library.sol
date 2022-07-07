@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
-contract Library{
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract Library is Ownable {
     event addedBook(string name, uint copies);
     event addedCopies(string name,uint copies);
     error alredyBorrwing(address user);
 
-    address immutable public owner;
     uint public count;
 
     struct Book{
         string name;
         uint copies;
     }
-    constructor(){
-        owner = msg.sender;
+    constructor() Ownable() {
     }
 
     //user => current borrowing book index
@@ -25,11 +25,8 @@ contract Library{
     mapping(uint => Book) public books;
     //bookIndex => previous borrowers
     mapping(uint => mapping(address=>bool)) borrowedBooks;
-    modifier onlyAdmin(){
-        require(msg.sender == owner,"not owner");
-        _;
-    }
-    function addBook(string calldata _name, uint _copies) external onlyAdmin{
+
+    function addBook(string calldata _name, uint _copies) external onlyOwner{
 
         if( indexes[_name]!=0){
             books[indexes[_name]].copies+=_copies;
