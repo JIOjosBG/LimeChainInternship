@@ -1,6 +1,9 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+//require('solidity-coverage');
+
+
 describe("Library", function () {
   it("Deploy", async function(){
     const Library = await ethers.getContractFactory("Library");
@@ -16,7 +19,7 @@ describe("Library", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
     
-    const borrowBook = await library.borrowBook(1);
+    const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
 
     const returnBook = await library.returnCurrentBook();
@@ -105,7 +108,7 @@ describe("Library", function () {
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
 
-    const borrowBook = await library.borrowBook(1);
+    const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
 
     book= await library.books(1);
@@ -127,7 +130,7 @@ describe("Library", function () {
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
 
-    const borrowBook = await library.borrowBook(1);
+    const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
 
     book= await library.books(1);
@@ -152,11 +155,11 @@ describe("Library", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    const borrowBook = await library.borrowBook(1);
+    const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
     var err=false;
     try {
-      await library.borrowBook(1);
+      await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     } catch(error) {
       err=true;
       expect(error.name).to.equals("Error");
@@ -208,13 +211,13 @@ describe("Library", function () {
     await addBook.wait();
     var err= false;
     
-    var borrowBook = await library.borrowBook(1);
+    var borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
-    borrowBook = await library.connect(addr1).borrowBook(1);
+    borrowBook = await library.connect(addr1).borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
 
     try{
-      borrowBook = await library.connect(addr2).borrowBook(1);
+      borrowBook = await library.connect(addr2).borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
       await borrowBook.wait();
     }catch(error){
       err=true;
@@ -222,4 +225,49 @@ describe("Library", function () {
     };
     expect(err).to.equal(true);
   });
+  it("borrowBook erro for not paying", async function(){
+    const Library = await ethers.getContractFactory("Library");
+    const library = await Library.deploy();
+    await library.deployed();
+
+    const addBook = await library.addBook("1984",2);
+    await addBook.wait();
+
+    var book= await library.books(1);
+    await book;
+    expect(book.name).to.equal("1984");
+    expect(book.copies).to.equal(2);
+    const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
+    await borrowBook.wait();
+
+    const withdraw = await library.withdraw();
+    await withdraw.wait();
+
+  });
+
+
+  it("withdraw", async function(){
+    const Library = await ethers.getContractFactory("Library");
+    const library = await Library.deploy();
+    await library.deployed();
+    const addBook = await library.addBook("1984",2);
+    await addBook.wait();
+
+    var book= await library.books(1);
+    await book;
+    expect(book.name).to.equal("1984");
+    expect(book.copies).to.equal(2);
+    var err=false;
+    try{
+      const borrowBook = await library.borrowBook(1);
+      await borrowBook.wait();
+    }catch(error){
+      err=true;
+      expect(error.name).to.equals("Error");
+    };
+    expect(err).to.equal(true);
+  });
+
+
+
 });

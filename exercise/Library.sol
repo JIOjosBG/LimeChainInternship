@@ -6,10 +6,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Library is Ownable {
     event addedBook(string name, uint copies);
     event addedCopies(string name,uint copies);
+    error notPaying();
     error alredyBorrwing(address user);
 
-    uint public count;
 
+    uint public count;
+    uint public immutable PRICE=10000;
     struct Book{
         string name;
         uint copies;
@@ -26,6 +28,14 @@ contract Library is Ownable {
     //bookIndex => previous borrowers
     mapping(uint => mapping(address=>bool)) borrowedBooks;
 
+    function withdraw() external onlyOwner payable{
+        require(address(this).balance > 0, "No eth to withdraw");
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
+    
+
+
     function addBook(string calldata _name, uint _copies) external onlyOwner{
 
         if( indexes[_name]!=0){
@@ -40,10 +50,15 @@ contract Library is Ownable {
         }
     }
 
-    function borrowBook(uint _index) external {
+    function borrowBook(uint _index) external payable{
         //msg.sender    49436
         //sender        49450
         //address sender = msg.sender;
+
+        if(msg.value<PRICE){
+            revert notPaying();
+        }
+
         if(currentlyBorrowing[msg.sender]>0){
             revert alredyBorrwing(msg.sender);
         }
