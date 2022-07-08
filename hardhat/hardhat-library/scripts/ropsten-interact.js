@@ -21,16 +21,22 @@ const run = async function() {
 
     // var borrowBook= await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     // await borrowBook;
+    var a= await library.getBook(1);
+    await a;
+    console.log(a.copies);
+    
+    // var returnBook= await library.returnCurrentBook();
+    // await returnBook;
 
-    try{
-        var a= await library.getBook(1);
-        await a;
-        console.log(a.copies);
-        var returnBook= await library.returnCurrentBook();
-        await returnBook;
-    }catch(error){
-        console.log(error.data);
-    }
+    // try{
+    //     var a= await library.getBook(1);
+    //     await a;
+    //     console.log(a.copies);
+    //     var returnBook= await library.returnCurrentBook();
+    //     await returnBook;
+    // }catch(error){
+    //     console.log(error.name);
+    // }
 }
 
 run();
