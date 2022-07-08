@@ -273,7 +273,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"exercise/Library.sol": "Library"
+			"Library.sol": "Library"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -303,12 +303,12 @@
 				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
 			]
 		},
-		"exercise/Library.sol": {
-			"keccak256": "0x33b075fc3e28f186fe4ccb47c795746afc9af4e88ca7891bf1827b8a16c16bc3",
+		"Library.sol": {
+			"keccak256": "0xae378f3f50b19adc930e901961bc153c27259777649068b8eb7997f0f83683d0",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://434d4f077e90bc7e8d39317c8729e8d23c020518104dfb8ca2a24912fbc2e365",
-				"dweb:/ipfs/QmTXUwE5xa7Xp1t6cvw2kQAL9LWRG6ZCC8pFjR1eJer2aA"
+				"bzz-raw://4a02f1d9dda25f7c4bb3c64548ea364935e3f7a0d48a930b06083a14ab75fe47",
+				"dweb:/ipfs/QmUygYpN14wczfWx1iv7CM4cxXqRBndg86EDaZecyTmggP"
 			]
 		}
 	},

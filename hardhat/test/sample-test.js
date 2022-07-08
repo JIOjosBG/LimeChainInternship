@@ -24,6 +24,9 @@ describe("Basic", function () {
 
     const returnBook = await library.returnCurrentBook();
     await returnBook.wait();
+
+    const borrowSecondBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.00000000000001")});
+    await borrowSecondBook.wait();
   });
   it("get owner addresses", async function(){
     const Library = await ethers.getContractFactory("Library");
@@ -45,7 +48,7 @@ describe("addBook", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    const book= await library.books(1);
+    const book= await library.getBook(1);
     await book;
     //console.log(book.name)
 
@@ -63,15 +66,20 @@ describe("addBook", function () {
     const addSecondBook = await library.addBook("1984",3);
     await addSecondBook.wait();
 
-    const book= await library.books(1);
+    const book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(5);
+    var error =false;
+    try{
+      const book2= await library.getBook(2);
+      await book2;
+    }catch(error){
+      err=true;
+      expect(error.name).to.equals("Error");
+    };
+    expect(err).to.equal(true);
 
-    const book2= await library.books(2);
-    await book2;
-    expect(book2.name).to.equal("");
-    expect(book2.copies).to.equal(0);
   });
 
   it("addBook different titles", async function(){
@@ -84,12 +92,12 @@ describe("addBook", function () {
     const addSecondBook = await library.addBook("Animal farm",3);
     await addSecondBook.wait();
 
-    const book= await library.books(1);
+    const book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
 
-    const book2= await library.books(2);
+    const book2= await library.getBook(2);
     await book2;
     expect(book2.name).to.equal("Animal farm");
     expect(book2.copies).to.equal(3);
@@ -123,7 +131,7 @@ describe("Borrow book", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    var book= await library.books(1);
+    var book= await library.getBook(1);
     await book;
 
     expect(book.name).to.equal("1984");
@@ -132,7 +140,7 @@ describe("Borrow book", function () {
     const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
 
-    book= await library.books(1);
+    book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(1);
@@ -188,7 +196,7 @@ describe("Borrow book", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    var book= await library.books(1);
+    var book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
@@ -212,7 +220,7 @@ describe("return error", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    var book= await library.books(1);
+    var book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
@@ -220,7 +228,7 @@ describe("return error", function () {
     const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
     await borrowBook.wait();
 
-    book= await library.books(1);
+    book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(1);
@@ -228,7 +236,7 @@ describe("return error", function () {
     const returnBook = await library.returnCurrentBook();
     await returnBook.wait();
 
-    book= await library.books(1);
+    book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
@@ -261,7 +269,7 @@ describe("withdraw", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    var book= await library.books(1);
+    var book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
@@ -282,7 +290,7 @@ describe("withdraw", function () {
     const addBook = await library.addBook("1984",2);
     await addBook.wait();
 
-    var book= await library.books(1);
+    var book= await library.getBook(1);
     await book;
     expect(book.name).to.equal("1984");
     expect(book.copies).to.equal(2);
@@ -315,4 +323,5 @@ describe("withdraw", function () {
     };
     expect(err).to.equal(true);
   });
+
 });

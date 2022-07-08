@@ -72,6 +72,9 @@ contract Library is Ownable {
         currentlyBorrowing[msg.sender] = _index;
         //note borrower to book
         borrowedBooks[_index][msg.sender]=true;
+        if(msg.value>PRICE){
+            payable(msg.sender).transfer(msg.value-PRICE);
+        }
     }
 
     function returnCurrentBook()external{

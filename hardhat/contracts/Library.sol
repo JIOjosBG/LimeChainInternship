@@ -32,6 +32,11 @@ contract Library is Ownable {
         payable(msg.sender).transfer(address(this).balance);
     }
 
+    function getBook(uint256 _i) external view returns (Book memory) {
+        require(_i <= count, "not in range");
+        return books[_i];
+    }
+
     function addBook(string calldata _name, uint256 _copies)
         external
         onlyOwner
@@ -52,19 +57,22 @@ contract Library is Ownable {
         //msg.sender    49436
         //sender        49450
         //address sender = msg.sender;
-
-        if (msg.value < PRICE) {
-            revert notPaying();
-        }
-
         if (currentlyBorrowing[msg.sender] > 0) {
             revert alredyBorrwing(msg.sender);
         }
+        Book storage b = books[_index];
+
+        require(b.copies > 0, "zero books left");
+
+        if (msg.value < PRICE) {
+            revert notPaying();
+        } else if (msg.value > PRICE) {
+            payable(msg.sender).transfer(msg.value - PRICE);
+        }
+
         //storage b 49371   56777
         //books[]   49436   56852
-        Book storage b = books[_index];
-        //check if enough books
-        require(b.copies > 0, "zero books left");
+
         --b.copies;
         //note book to borrower
         currentlyBorrowing[msg.sender] = _index;
