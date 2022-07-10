@@ -10,9 +10,10 @@ import Header from './components/Header';
 import Loader from './components/Loader';
 import ConnectButton from './components/ConnectButton';
 
+import Info from './components/Info';
+
 import { Web3Provider } from '@ethersproject/providers';
 import { getChainData } from './helpers/utilities';
-
 
 import {
   LIBRARY_ADDRESS
@@ -56,6 +57,8 @@ const SBalances = styled(SLanding)`
   }
 `;
 
+
+
 interface IAppState {
   fetching: boolean;
   address: string;
@@ -66,6 +69,7 @@ interface IAppState {
   result: any | null;
   libContract: any | null;
   info: any | null;
+  count: any;
 }
 
 const INITIAL_STATE: IAppState = {
@@ -77,8 +81,10 @@ const INITIAL_STATE: IAppState = {
   pendingRequest: false,
   result: null,
   libContract: null,
-  info: null
+  info: null,
+  count: 0,
 };
+
 
 class App extends React.Component<any, any> {
   // @ts-ignore
@@ -112,7 +118,7 @@ class App extends React.Component<any, any> {
 
     const network = await library.getNetwork();
 
-    const address = this.provider.selectedAddress ? this.provider.selectedAddress : this.provider.accounts[0];
+    const address = await this.provider.selectedAddress;//  ? this.provider.selectedAddress : await this.provider.accounts[0];
 
 
     const libContract = getContract(LIBRARY_ADDRESS, LIBRARY.abi, library, address);
@@ -123,6 +129,7 @@ class App extends React.Component<any, any> {
       address,
       connected: true,
       libContract
+      
     });
     await this.subscribeToProviderEvents(this.provider);
   };
@@ -195,15 +202,10 @@ class App extends React.Component<any, any> {
 
   };
 
-
-  public getFirstBook = async () => {
-    const { libContract } = this.state;
-  
-    const book = await libContract.books(1);
-    const a = book.name;
-    await this.setState({ a });
-  };
-
+  public getContr = async () => {
+    const c = await this.state.libContract;
+    return c;
+  }
 
   public render = () => {
     const {
@@ -212,6 +214,9 @@ class App extends React.Component<any, any> {
       chainId,
       fetching
     } = this.state;
+
+    // const c= await this.getCount();
+
     return (
       <SLayout>
         <Column maxWidth={1000} spanHeight>
@@ -220,8 +225,18 @@ class App extends React.Component<any, any> {
             address={address}
             chainId={chainId}
             killSession={this.resetApp}
-          />
+          />        
           <SContent>
+            <Info  getContract={this.getContr}  />
+            {LIBRARY_ADDRESS}
+            <br/>
+            {LIBRARY.abi[10].type}
+            <br/>
+            {this.state.library ? "a" : "b"}
+            <br/>
+            {address}
+            <br/>
+            {this.state.libContract?"a":"b"}
             {fetching ? (
               <Column center>
                 <SContainer>
@@ -235,6 +250,8 @@ class App extends React.Component<any, any> {
               )}
           </SContent>
         </Column>
+        
+
       </SLayout>
     );
   };
