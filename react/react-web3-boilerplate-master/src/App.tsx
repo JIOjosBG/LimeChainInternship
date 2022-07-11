@@ -5,12 +5,12 @@ import Web3Modal from 'web3modal';
 // @ts-ignore
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Column from './components/Column';
-import Wrapper from './components/Wrapper';
+// import Wrapper from './components/Wrapper';
 import Header from './components/Header';
 import Loader from './components/Loader';
 import ConnectButton from './components/ConnectButton';
 
-import Info from './components/Info';
+import Body from './components/Body';
 
 import { Web3Provider } from '@ethersproject/providers';
 import { getChainData } from './helpers/utilities';
@@ -22,40 +22,46 @@ import { getContract } from './helpers/ethers';
 import LIBRARY from './constants/abis/Library.json';
 // import './constants/abis/Library.json' as LIBRARY;
 
-const SLayout = styled.div`
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  text-align: center;
+// const SLayout = styled.div`
+//   position: relative;
+//   width: 100%;
+//   min-height: 100vh;
+//   text-align: center;
+// `;
+
+// const SContent = styled(Wrapper)`
+//   width: 100%;
+//   height: 100%;
+//   padding: 0 16px;
+// `;
+
+// const SContainer = styled.div`
+//   height: 100%;
+//   min-height: 200px;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+//   word-break: break-word;
+// `;
+
+// const SLanding = styled(Column)`
+//   height: 600px;
+// `;
+
+const Main = styled.div`
+  margin: 0% 10%;
 `;
 
-const SContent = styled(Wrapper)`
-  width: 100%;
-  height: 100%;
-  padding: 0 16px;
-`;
 
-const SContainer = styled.div`
-  height: 100%;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  word-break: break-word;
-`;
-
-const SLanding = styled(Column)`
-  height: 600px;
-`;
 
 // @ts-ignore
-const SBalances = styled(SLanding)`
-  height: 100%;
-  & h3 {
-    padding-top: 30px;
-  }
-`;
+// const SBalances = styled(SLanding)`
+//   height: 100%;
+//   & h3 {
+//     padding-top: 30px;
+//   }
+// `;
 
 
 
@@ -178,6 +184,7 @@ class App extends React.Component<any, any> {
     this.resetApp();
   }
 
+
   public getNetwork = () => getChainData(this.state.chainId).network;
 
   public getProviderOptions = () => {
@@ -218,41 +225,30 @@ class App extends React.Component<any, any> {
     // const c= await this.getCount();
 
     return (
-      <SLayout>
-        <Column maxWidth={1000} spanHeight>
+      <Main>
+
           <Header
             connected={connected}
             address={address}
             chainId={chainId}
             killSession={this.resetApp}
           />        
-          <SContent>
-            <Info  getContract={this.getContr}  />
-            {LIBRARY_ADDRESS}
-            <br/>
-            {LIBRARY.abi[10].type}
-            <br/>
-            {this.state.library ? "a" : "b"}
-            <br/>
-            {address}
-            <br/>
-            {this.state.libContract?"a":"b"}
             {fetching ? (
               <Column center>
-                <SContainer>
                   <Loader />
-                </SContainer>
               </Column>
             ) : (
-                <SLanding center>
-                  {!this.state.connected && <ConnectButton onClick={this.onConnect} />}
-                </SLanding>
+                <div >
+                  {
+                  !this.state.connected ?
+                    <Column center><ConnectButton onClick={this.onConnect} /></Column>
+                    :
+                    <Body user={this.state.address} getContract={this.getContr}  />
+                  }
+                </div>
               )}
-          </SContent>
-        </Column>
-        
-
-      </SLayout>
+      
+        </Main>
     );
   };
 }
