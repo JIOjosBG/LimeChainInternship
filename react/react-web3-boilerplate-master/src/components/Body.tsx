@@ -15,6 +15,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 //   # width:100%;
 //   background: papayawhip;
 // `;
+const bookStyle = {
+  width: '100%',
+  // backgroundColor: "#eeffee",
+}
 
 class Body extends Component<any, any> {
     public myTimer: NodeJS.Timeout;
@@ -123,19 +127,20 @@ class Body extends Component<any, any> {
             {
             this.state.isOwner &&
             <Col>
-                <Form>
-                  <Form.Control
-                  type="text" 
-                  value={this.state.value}
-                  onChange={(e) => this.setState({value:e.target.value})}
-                  />
+
+              <Form>
+                <Form.Control
+                type="text" 
+                value={this.state.value}
+                onChange={(e) => this.setState({value:e.target.value})}
+                />
                 <Button onClick={()=> {
                   this.addBook(this.state.value,1) 
                   this.setState({value:""})
-                  }}>
+                }}>
                   Add book
                 </Button>
-                  </Form>
+              </Form>
             </Col> 
     }
     {this.state.isOwner &&
@@ -151,7 +156,7 @@ class Body extends Component<any, any> {
             
             <Row>
             { this.state.books?
-            this.state.books.map((book:any,index:number) => <Col lg={4} key={book.name}><Button onClick={() => this.borrowBook(index+1)}  key={book.name}> {book.name} - {parseInt(book.copies._hex,16)}</Button></Col>)
+            this.state.books.map((book:any,index:number) => <Col style={{padding:10}} lg={4} key={book.name}> <Button style={bookStyle} onClick={() => this.borrowBook(index+1)}  key={book.name}> {book.name} - {parseInt(book.copies._hex,16)}</Button></Col>)
             :
             <Circles color="#00BFFF" height={80} width={80}/>
             }
