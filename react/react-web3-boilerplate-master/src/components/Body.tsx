@@ -124,8 +124,8 @@ class Body extends Component<any, any> {
       await this.update();
     }
 
-    public addBook = async (name:string, c:number) => {
-      const add = await this.state.contract.addBook(name,c);
+    public addBook = async (isbn:string,name:string, c:number) => {
+      const add = await this.state.contract.addBook(isbn,name,c);
       await add;
       this.update()
     }
@@ -159,18 +159,26 @@ class Body extends Component<any, any> {
                 <Form.Control
                 type="text" 
                 value={this.state.value}
+                placeholder="name"
                 onChange={(e) => this.setState({value:e.target.value})}
+                />
+                <Form.Control
+                type="text"
+                placeholder="isbn"
+                value={this.state.isbn}
+                onChange={(e) => this.setState({isbn:e.target.value})}
                 />
 
                 <Form.Control
                 type="number" 
+                placeholder="count"
                 value={this.state.number}
                 onChange={(e) => this.setState({number:e.target.value})}
                 />
 
                 <Button style={{...controlButton}} onClick={()=> {
-                  this.addBook(this.state.value,this.state.number) 
-                  this.setState({value:"",number:""})
+                  this.addBook(this.state.isbn,this.state.value,this.state.number) 
+                  this.setState({isbn:"",value:"",number:""})
                 }}>
                   Add book
                 </Button>
@@ -197,6 +205,7 @@ class Body extends Component<any, any> {
             { this.state.books?
             this.state.books.map((book:any,index:number) => {
               return (<Col style={{padding:10}} lg={4} key={book.name}>
+                <img src={"https://covers.openlibrary.org/b/isbn/"+book.isbn+"-M.jpg"} />
               {parseInt(book.copies._hex,16)
               ?
                 <Button style={{...bookStyle, ...availableBook }} onClick={() => this.borrowBook(index+1)}  key={book.name}> {book.name} - {parseInt(book.copies._hex,16)}</Button>
