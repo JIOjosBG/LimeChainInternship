@@ -20,6 +20,7 @@ import {
 } from './constants';
 import { getContract } from './helpers/ethers';
 import LIBRARY from './constants/abis/Library.json';
+// import { getAddress } from '@ethersproject/address';
 // import './constants/abis/Library.json' as LIBRARY;
 
 // const SLayout = styled.div`
@@ -93,6 +94,7 @@ const INITIAL_STATE: IAppState = {
 
 
 class App extends React.Component<any, any> {
+
   // @ts-ignore
   public web3Modal: Web3Modal;
   public state: IAppState;
@@ -111,7 +113,7 @@ class App extends React.Component<any, any> {
     });
   }
 
-  public componentDidMount() {
+  public componentDidMount=async()=>{
     if (this.web3Modal.cachedProvider) {
       this.onConnect();
     }
@@ -170,6 +172,7 @@ class App extends React.Component<any, any> {
       await this.resetApp();
     } else {
       await this.setState({ address: accounts[0] });
+      await this.resetApp();
     }
   }
 
@@ -221,7 +224,6 @@ class App extends React.Component<any, any> {
       chainId,
       fetching
     } = this.state;
-
     // const c= await this.getCount();
 
     return (
@@ -243,7 +245,7 @@ class App extends React.Component<any, any> {
                   !this.state.connected ?
                     <Column center><ConnectButton onClick={this.onConnect} /></Column>
                     :
-                    <Body user={this.state.address} getContract={this.getContr}  />
+                    <Body lib={this.state.library} user={this.state.address} getContract={this.getContr} />
                   }
                 </div>
               )}

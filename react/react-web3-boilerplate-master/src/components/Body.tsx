@@ -1,4 +1,5 @@
 import  React, {Component} from 'react'
+
 // import Button from './Button';
 // import Column from './Column';
 // import styled from 'styled-components';
@@ -19,12 +20,27 @@ const bookStyle = {
   width: '100%',
   // backgroundColor: "#eeffee",
 }
+const availableBook = {
+  backgroundColor: "#28eb9b",
+  borderColor: '#28eb9b'
+}
+const unavailableBook = {
+  backgroundColor: "#ff7f3c",
+  borderColor: '#ff7f3c'
+}
+
+const controlButton = {
+  backgroundColor: "#d5db5d",
+  borderColor: '#d5db5d'
+}
+
+
 
 class Body extends Component<any, any> {
     public myTimer: NodeJS.Timeout;
     constructor(props: any) {
       super(props);
-      this.state = {contract: props.getContract(),getContract: props.getContract,user: props.user};
+      this.state = {lib:props.lib, contract: props.getContract(),getContract: props.getContract,user: props.user};
       this.init()
     }
     public componentDidMount = () => {
@@ -48,6 +64,10 @@ class Body extends Component<any, any> {
         // return b.copies._hex;
     } 
 
+    public getPricePerBorrow = async () =>{
+      const price = await this.state.contract.PRICE();
+      this.setState({price:parseInt(price._hex,16)})
+    }
     public loadBooks = async () => {
         await this.getBookCount();
         const books:any[] = new Array();
@@ -62,7 +82,7 @@ class Body extends Component<any, any> {
     }
 
     public borrowBook = async(i:number) =>{
-      const borrow = await this.state.contract.borrowBook(i,{value:"1000000000000"},);
+      const borrow = await this.state.contract.borrowBook(i,{value:this.state.price},);
       await borrow;
       await this.update();
     }
@@ -83,12 +103,19 @@ class Body extends Component<any, any> {
       await this.update();
     }
 
+    public getContractBalance = async() => {
+      const balance = await this.state.lib.getBalance(this.state.contract.address);
+      await this.setState({balance: parseInt(balance._hex,16)})
+    }
+
     public update = async () => {
       await this.getBookCount();
       await this.loadBooks();
       await this.checkIfHasToReturn();
       await this.checkIfOwner();
       await this.getCurrentBook();
+      await this.getContractBalance();
+      await this.getPricePerBorrow();
     }
 
     public returnBook = async () => {
@@ -115,8 +142,8 @@ class Body extends Component<any, any> {
         <Container>
           <Row className="rows">
             <Col className="cols">
-            {this.state.hasToReturn ? <Button onClick={this.returnBook}>Return {this.state.currentBook ? this.state.currentBook.name : "current book" }</Button> :<h5>You can borrow a book</h5>}
-              {!this.state.contract &&  <Button onClick={this.init}>init</Button>}
+            {this.state.hasToReturn ? <Button style={{...controlButton}}onClick={this.returnBook}>Return {this.state.currentBook ? this.state.currentBook.name : "current book" }</Button> :<h5>You can borrow a book</h5>}
+              {!this.state.contract &&  <Button style={{...controlButton}} onClick={this.init}>init</Button>}
             </Col>
             <Col>
               <h5>
@@ -134,9 +161,16 @@ class Body extends Component<any, any> {
                 value={this.state.value}
                 onChange={(e) => this.setState({value:e.target.value})}
                 />
-                <Button onClick={()=> {
-                  this.addBook(this.state.value,1) 
-                  this.setState({value:""})
+
+                <Form.Control
+                type="number" 
+                value={this.state.number}
+                onChange={(e) => this.setState({number:e.target.value})}
+                />
+
+                <Button style={{...controlButton}} onClick={()=> {
+                  this.addBook(this.state.value,this.state.number) 
+                  this.setState({value:"",number:""})
                 }}>
                   Add book
                 </Button>
@@ -145,23 +179,36 @@ class Body extends Component<any, any> {
     }
     {this.state.isOwner &&
             <Col>
-              <Button onClick={this.withdraw}>
+              <Button style={{...controlButton}} onClick={this.withdraw}>
                   Withdraw
                 </Button>
             </Col>
-              }
-
+    }
+    {this.state.isOwner &&
+            <Col>
+              <h3>
+                { this.state.balance } in da bank
+              </h3>
+            </Col>
+    }
           </Row>
           <Container>
-            
             <Row>
             { this.state.books?
-            this.state.books.map((book:any,index:number) => <Col style={{padding:10}} lg={4} key={book.name}> <Button style={bookStyle} onClick={() => this.borrowBook(index+1)}  key={book.name}> {book.name} - {parseInt(book.copies._hex,16)}</Button></Col>)
-            :
+            this.state.books.map((book:any,index:number) => {
+              return (<Col style={{padding:10}} lg={4} key={book.name}>
+              {parseInt(book.copies._hex,16)
+              ?
+                <Button style={{...bookStyle, ...availableBook }} onClick={() => this.borrowBook(index+1)}  key={book.name}> {book.name} - {parseInt(book.copies._hex,16)}</Button>
+              :
+                <Button style={{...bookStyle, ...unavailableBook }} onClick={() => this.borrowBook(index+1)}  key={book.name}> {book.name} - {parseInt(book.copies._hex,16)}</Button>
+              }
+              </Col>
+              )
+            })
+              :
             <Circles color="#00BFFF" height={80} width={80}/>
             }
-            
-
           </Row>
           </Container>
         </Container>
