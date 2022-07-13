@@ -2,21 +2,27 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./LIB.sol";
 
 contract Library is Ownable {
-    event addedBook(string name, uint256 copies);
-    event addedCopies(string name, uint256 copies);
+    event addedBook(string isbn, uint256 copies);
+    event addedCopies(string isbn, uint256 copies);
     error notPaying();
     error alredyBorrwing(address user);
-
+    LIB public immutable token;
+    uint constant ethercent = 10000000000000000;
     uint256 public count;
-    uint256 public immutable PRICE = 10000;
+    uint256 public immutable PRICE = ethercent;
     struct Book {
+        string isbn;
         string name;
         uint256 copies;
+        address[] borrowed;
     }
 
-    constructor() Ownable() {}
+    constructor() Ownable() {
+        token = new LIB();
+    }
 
     //user => current borrowing book index
     mapping(address => uint256) public currentlyBorrowing;
@@ -24,52 +30,50 @@ contract Library is Ownable {
     mapping(string => uint256) public indexes;
     //index => book
     mapping(uint256 => Book) public books;
-    //bookIndex => previous borrowers
-    mapping(uint256 => mapping(address => bool)) borrowedBooks;
 
-    function withdraw() external payable onlyOwner {
-        require(address(this).balance > 0, "No eth to withdraw");
-        payable(msg.sender).transfer(address(this).balance);
-    }
 
     function getBook(uint256 _i) external view returns (Book memory) {
         require(_i <= count, "not in range");
         return books[_i];
     }
 
-    function addBook(string calldata _name, uint256 _copies)
-        external
-        onlyOwner
-    {
-        if (indexes[_name] != 0) {
-            books[indexes[_name]].copies += _copies;
-            emit addedCopies(_name, _copies);
+    function addBook(
+        string calldata _isbn,
+        string calldata _name,
+        uint256 _copies
+    ) external onlyOwner {
+        if (indexes[_isbn] != 0) {
+            books[indexes[_isbn]].copies += _copies;
+            emit addedCopies(_isbn, _copies);
             return;
         } else {
             ++count;
-            books[count] = Book({name: _name, copies: _copies});
-            indexes[_name] = count;
-            emit addedBook(_name, _copies);
+            books[count] = Book(_isbn,_name,_copies,new address[](0));
+            indexes[_isbn] = count;
+            emit addedBook(_isbn, _copies);
         }
     }
+    function buyLIB() external payable {
+        require(msg.value>0,">0 wei required");
+        token.mint(msg.sender,msg.value);
+    }
 
-    function borrowBook(uint256 _index) external payable {
-        //msg.sender    49436
-        //sender        49450
-        //address sender = msg.sender;
+    function getLIB() external view returns(uint){
+        return token.balanceOf(msg.sender);
+    }
+
+    function borrowBook(uint256 _index) external{
+        token.mint(address(this),ethercent*10);
+        require(token.balanceOf(msg.sender)>=PRICE,"not enough LIB");
         if (currentlyBorrowing[msg.sender] > 0) {
             revert alredyBorrwing(msg.sender);
         }
         Book storage b = books[_index];
-
         require(b.copies > 0, "zero books left");
-
-        if (msg.value < PRICE) {
-            revert notPaying();
-        } else if (msg.value > PRICE) {
-            payable(msg.sender).transfer(msg.value - PRICE);
-        }
-
+        require(token.balanceOf(msg.sender)>PRICE,"doesnt have LIB HEREEE");
+        
+        bool success = token.transferFrom(msg.sender,address(this),PRICE);
+        require(success,"something is wrong");
         //storage b 49371   56777
         //books[]   49436   56852
 
@@ -77,13 +81,23 @@ contract Library is Ownable {
         //note book to borrower
         currentlyBorrowing[msg.sender] = _index;
         //note borrower to book
-        borrowedBooks[_index][msg.sender] = true;
+        books[_index].borrowed.push(msg.sender);
     }
+
+
 
     function returnCurrentBook() external {
         uint256 _index = currentlyBorrowing[msg.sender];
         require(_index > 0, "not borrowng");
         currentlyBorrowing[msg.sender] = 0;
         ++books[_index].copies;
+    }
+
+    function withdraw() external payable onlyOwner {
+        uint amount = token.balanceOf(address(this));
+        require(address(this).balance > 0, "No eth to withdraw");
+        require(amount>0,"no tokens here");
+        token.burn(amount);
+        payable(owner()).transfer(address(this).balance);
     }
 }

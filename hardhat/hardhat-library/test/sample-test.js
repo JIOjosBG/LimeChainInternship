@@ -16,7 +16,7 @@ describe("Basic", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
     
     const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
@@ -45,7 +45,7 @@ describe("addBook", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     const book= await library.getBook(1);
@@ -61,9 +61,9 @@ describe("addBook", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
-    const addSecondBook = await library.addBook("1984",3);
+    const addSecondBook = await library.addBook("9786589711377","1984",3);
     await addSecondBook.wait();
 
     const book= await library.getBook(1);
@@ -87,9 +87,9 @@ describe("addBook", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
-    const addSecondBook = await library.addBook("Animal farm",3);
+    const addSecondBook = await library.addBook("9780151002177","Animal farm",3);
     await addSecondBook.wait();
 
     const book= await library.getBook(1);
@@ -108,7 +108,7 @@ describe("addBook", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.connect(_owner).addBook("1984",2);
+    const addBook = await library.connect(_owner).addBook("9786589711377","1984",2);
     await addBook.wait();
     var err= false;
     try{
@@ -128,7 +128,7 @@ describe("Borrow book", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     var book= await library.getBook(1);
@@ -151,7 +151,7 @@ describe("Borrow book", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     const borrowBook = await library.borrowBook(1,{ value: ethers.utils.parseEther("0.5")});
@@ -171,7 +171,7 @@ describe("Borrow book", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.connect(_owner).addBook("1984",2);
+    const addBook = await library.connect(_owner).addBook("9786589711377","1984",2);
     await addBook.wait();
     var err= false;
     
@@ -193,7 +193,7 @@ describe("Borrow book", function () {
     const Library = await ethers.getContractFactory("Library");
     const library = await Library.deploy();
     await library.deployed();
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     var book= await library.getBook(1);
@@ -217,7 +217,7 @@ describe("return error", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     var book= await library.getBook(1);
@@ -266,7 +266,7 @@ describe("withdraw", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     var book= await library.getBook(1);
@@ -287,7 +287,7 @@ describe("withdraw", function () {
     const library = await Library.deploy();
     await library.deployed();
 
-    const addBook = await library.addBook("1984",2);
+    const addBook = await library.addBook("9786589711377","1984",2);
     await addBook.wait();
 
     var book= await library.getBook(1);
