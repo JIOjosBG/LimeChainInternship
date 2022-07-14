@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-
 // import Button from './Button';
 // import Column from './Column';
 // import styled from 'styled-components';
@@ -7,6 +6,8 @@ import { Circles } from 'react-loader-spinner'
 import { Container, Row, Col, Form } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+import { ethers,utils } from "ethers";
 
 // import Column from './Column';
 
@@ -40,7 +41,7 @@ class Body extends Component<any, any> {
   public myTimer: NodeJS.Timeout;
   constructor(props: any) {
     super(props);
-    this.state = { lib: props.lib, contract: props.getContract(), getContract: props.getContract, user: props.user };
+    this.state = {provider:props.provider, userAddress:props.address, lib: props.lib, contract: props.getContract(), getContract: props.getContract, user: props.user, token: props.tokenContract };
     this.init()
   }
   public componentDidMount = () => {
@@ -82,7 +83,7 @@ class Body extends Component<any, any> {
   }
 
   public borrowBook = async (i: number) => {
-    const borrow = await this.state.contract.borrowBook(i, { value: this.state.price },);
+    const borrow = await this.state.contract.borrowBook(i);
     await borrow;
     await this.update();
   }
@@ -102,10 +103,20 @@ class Body extends Component<any, any> {
     await this.getContract();
     await this.update();
   }
+  
 
-  public getContractBalance = async () => {
-    const balance = await this.state.lib.getBalance(this.state.contract.address);
-    await this.setState({ balance: parseInt(balance._hex, 16) })
+  public getBalances = async () => {
+    // const libraryBalance = await this.state.lib.getBalance(this.state.contract.address);
+    // await this.setState({ libraryBalance: parseInt(libraryBalance._hex, 16) })
+    // const ethValue = ethers.utils.formatEther(1000000000000);
+
+
+    const libraryBalance = (await this.state.token.balanceOf(this.state.contract.address))._hex;
+    const userBalance =  (await this.state.token.balanceOf(this.state.userAddress))._hex;
+  
+    await this.setState({ libraryBalance: ethers.utils.formatEther(libraryBalance) });
+    await this.setState({ userBalance: ethers.utils.formatEther(userBalance) });
+    
   }
 
   public update = async () => {
@@ -114,7 +125,7 @@ class Body extends Component<any, any> {
     await this.checkIfHasToReturn();
     await this.checkIfOwner();
     await this.getCurrentBook();
-    await this.getContractBalance();
+    await this.getBalances();
     await this.getPricePerBorrow();
   }
 
@@ -136,10 +147,56 @@ class Body extends Component<any, any> {
   public withdraw = async () => {
     await this.state.contract.withdraw();
   }
+
+  public buyLIB = async () => {
+
+    await this.state.contract.buyLIB({ value: utils.parseEther(this.state.libToBuy) });
+
+    // await this.state.token.approve(await this.state.contract.address,await this.state.contract.PRICE());
+  }
+
+  public togglePopup = () => {
+    this.setState({isOpen:!this.state.isOpen});
+  }
+
+  public giveAllowance = async () =>{
+    await this.state.token.approve(await this.state.contract.address,"10000000000000000");
+  }
+
   public render() {
     return (
 
       <Container>
+        <Row>
+          <Col>
+          <Form>
+              <Form.Control
+                type="number"
+                placeholder="amount"
+                value={this.state.libToBuy}
+                onChange={(e) => this.setState({ libToBuy: e.target.value })}
+              />
+
+              <Button style={{ ...controlButton }} onClick={() => {
+                this.buyLIB()
+                this.setState({ libToBuy: ""})
+              }}>
+                BUY LIB tokens
+              </Button>
+            </Form>
+          </Col>
+          <Col>
+              <h5>
+                You have {this.state.userBalance} LIB
+              </h5>
+          </Col>
+          <Col>
+              <Button onClick={this.giveAllowance}>
+                Give allowance
+              </Button>
+          </Col>
+
+        </Row>
         <Row className="rows">
           <Col className="cols">
             {this.state.hasToReturn ? <Button style={{ ...controlButton }} onClick={this.returnBook}>Return {this.state.currentBook ? this.state.currentBook.name : "current book"}</Button> : <h5>You can borrow a book</h5>}
@@ -195,7 +252,7 @@ class Body extends Component<any, any> {
           {this.state.isOwner &&
             <Col>
               <h3>
-                {this.state.balance} in da bank
+                {this.state.libraryBalance} LIB in da bank
               </h3>
             </Col>
           }

@@ -20,6 +20,7 @@ import {
 } from './constants';
 import { getContract } from './helpers/ethers';
 import LIBRARY from './constants/abis/Library.json';
+import TOKEN from './constants/abis/LIB.json';
 // import { getAddress } from '@ethersproject/address';
 // import './constants/abis/Library.json' as LIBRARY;
 
@@ -75,6 +76,7 @@ interface IAppState {
   pendingRequest: boolean;
   result: any | null;
   libContract: any | null;
+  tokenContract: any | null;
   info: any | null;
   count: any;
 }
@@ -88,6 +90,7 @@ const INITIAL_STATE: IAppState = {
   pendingRequest: false,
   result: null,
   libContract: null,
+  tokenContract: null,
   info: null,
   count: 0,
 };
@@ -129,14 +132,17 @@ class App extends React.Component<any, any> {
     const address = await this.provider.selectedAddress;//  ? this.provider.selectedAddress : await this.provider.accounts[0];
 
 
-    const libContract = getContract(LIBRARY_ADDRESS, LIBRARY.abi, library, address);
+    const libContract = await getContract(LIBRARY_ADDRESS, LIBRARY.abi, library, address);
+    const TOKEN_ADDRESS = await libContract.token();
+    const tokenContract = await getContract(TOKEN_ADDRESS,TOKEN.abi,library,address);
     await this.setState({
       provider:this.provider,
       library,
       chainId: network.chainId,
       address,
       connected: true,
-      libContract
+      libContract,
+      tokenContract
       
     });
     await this.subscribeToProviderEvents(this.provider);
@@ -213,8 +219,7 @@ class App extends React.Component<any, any> {
   };
 
   public getContr = async () => {
-    const c = await this.state.libContract;
-    return c;
+    return this.state.libContract;
   }
 
   public render = () => {
@@ -245,7 +250,7 @@ class App extends React.Component<any, any> {
                   !this.state.connected ?
                     <Column center><ConnectButton onClick={this.onConnect} /></Column>
                     :
-                    <Body lib={this.state.library} user={this.state.address} getContract={this.getContr} />
+                    <Body propvider={this.provider} address={address} token={this.state.tokenContract} user={this.state.address} getContract={this.getContr} tokenContract={this.state.tokenContract} />
                   }
                 </div>
               )}

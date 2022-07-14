@@ -10,9 +10,8 @@ contract Library is Ownable {
     error notPaying();
     error alredyBorrwing(address user);
     LIB public immutable token;
-    uint256 constant ethercent = 10000000000000000;
     uint256 public count;
-    uint256 public immutable PRICE = ethercent;
+    uint256 public immutable PRICE = 10000000000000000;
     struct Book {
         string isbn;
         string name;
@@ -59,14 +58,12 @@ contract Library is Ownable {
     }
 
     function borrowBook(uint256 _index) external {
-        token.mint(address(this), ethercent * 10);
         require(token.balanceOf(msg.sender) >= PRICE, "not enough LIB");
         if (currentlyBorrowing[msg.sender] > 0) {
             revert alredyBorrwing(msg.sender);
         }
         Book storage b = books[_index];
         require(b.copies > 0, "zero books left");
-        require(token.balanceOf(msg.sender) > PRICE, "doesnt have LIB HEREEE");
 
         // bool success =
         token.transferFrom(msg.sender, address(this), PRICE);
