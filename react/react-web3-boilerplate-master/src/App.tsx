@@ -21,6 +21,9 @@ import {
 import { getContract } from './helpers/ethers';
 import LIBRARY from './constants/abis/Library.json';
 import TOKEN from './constants/abis/LIB.json';
+
+
+
 // import { getAddress } from '@ethersproject/address';
 // import './constants/abis/Library.json' as LIBRARY;
 
@@ -148,6 +151,8 @@ class App extends React.Component<any, any> {
     await this.subscribeToProviderEvents(this.provider);
   };
 
+
+
   public subscribeToProviderEvents = async (provider:any) => {
     if (!provider.on) {
       return;
@@ -208,6 +213,7 @@ class App extends React.Component<any, any> {
     return providerOptions;
   };
 
+
   public resetApp = async () => {
     await this.web3Modal.clearCachedProvider();
     localStorage.removeItem("WEB3_CONNECT_CACHED_PROVIDER");
@@ -250,7 +256,7 @@ class App extends React.Component<any, any> {
                   !this.state.connected ?
                     <Column center><ConnectButton onClick={this.onConnect} /></Column>
                     :
-                    <Body propvider={this.provider} address={address} token={this.state.tokenContract} user={this.state.address} getContract={this.getContr} tokenContract={this.state.tokenContract} />
+                    <Body   library={this.state.library} provider={this.provider} address={address} token={this.state.tokenContract} user={this.state.address} getContract={this.getContr} tokenContract={this.state.tokenContract} />
                   }
                 </div>
               )}

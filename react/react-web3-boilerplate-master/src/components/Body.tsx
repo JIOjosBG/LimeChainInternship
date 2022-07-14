@@ -41,7 +41,7 @@ class Body extends Component<any, any> {
   public myTimer: NodeJS.Timeout;
   constructor(props: any) {
     super(props);
-    this.state = {provider:props.provider, userAddress:props.address, lib: props.lib, contract: props.getContract(), getContract: props.getContract, user: props.user, token: props.tokenContract };
+    this.state = {library: props.library, provider:props.provider, userAddress:props.address, lib: props.lib, contract: props.getContract(), getContract: props.getContract, user: props.user, token: props.tokenContract };
     this.init()
   }
   public componentDidMount = () => {
@@ -82,8 +82,19 @@ class Body extends Component<any, any> {
     this.setState({ hasToReturn: parseInt(hasToReturn._hex, 16) });
   }
 
+  // uint256 _index,
+  // uint256 value,
+  // uint256 deadline,
+  // uint8 v,
+  // bytes32 r,
+  // bytes32 s
+
   public borrowBook = async (i: number) => {
-    const borrow = await this.state.contract.borrowBook(i);
+    const preparedSignature = await this.onAttemptToApprove();
+    const {v,r,s,deadline} = preparedSignature;
+    
+    
+    const borrow = await this.state.contract.borrowBook(i, utils.parseEther('0.01'), deadline, v, r, s);
     await borrow;
     await this.update();
   }
@@ -104,7 +115,6 @@ class Body extends Component<any, any> {
     await this.update();
   }
   
-
   public getBalances = async () => {
     // const libraryBalance = await this.state.lib.getBalance(this.state.contract.address);
     // await this.setState({ libraryBalance: parseInt(libraryBalance._hex, 16) })
@@ -113,8 +123,11 @@ class Body extends Component<any, any> {
 
     const libraryBalance = (await this.state.token.balanceOf(this.state.contract.address))._hex;
     const userBalance =  (await this.state.token.balanceOf(this.state.userAddress))._hex;
-  
     await this.setState({ libraryBalance: ethers.utils.formatEther(libraryBalance) });
+    // const balance = typeof await this.state.provider.get;
+
+    // await this.setState({ libraryETHBalance: balance });
+
     await this.setState({ userBalance: ethers.utils.formatEther(userBalance) });
     
   }
@@ -149,24 +162,97 @@ class Body extends Component<any, any> {
   }
 
   public buyLIB = async () => {
-
     await this.state.contract.buyLIB({ value: utils.parseEther(this.state.libToBuy) });
-
     // await this.state.token.approve(await this.state.contract.address,await this.state.contract.PRICE());
   }
-
   public togglePopup = () => {
     this.setState({isOpen:!this.state.isOpen});
   }
-
   public giveAllowance = async () =>{
     await this.state.token.approve(await this.state.contract.address,"10000000000000000");
   }
+
+  // public signMessage = async () => {
+  //   const messageToSign = "watafak"
+  //   const signer = this.state.library.getSigner();
+  //   const messageHash = utils.solidityKeccak256(['string'], [messageToSign])
+  //   const arrayfiedHash = utils.arrayify(messageHash);
+  //   const signedMessage = await signer.signMessage(arrayfiedHash);
+  //   return signedMessage;
+
+  // }
+
+  public async onAttemptToApprove() {
+		const { token, userAddress, library } = this.state;
+		
+		const nonce = (await token.nonces(userAddress)); // Our Token Contract Nonces
+    const deadline = + new Date() + 60 * 60; // Permit with deadline which the permit is valid
+    const wrapValue = utils.parseEther('0.01'); // Value to approve for the spender to use
+		
+		const EIP712Domain = [ // array of objects -> properties from the contract and the types of them ircwithPermit
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'verifyingContract', type: 'address' }
+    ];
+
+    const domain = {
+        name: await token.name(),
+        version: '1',
+        verifyingContract: token.address
+    };
+
+    const Permit = [ // array of objects -> properties from erc20withpermit
+        { name: 'owner', type: 'address' },
+        { name: 'spender', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'nonce', type: 'uint256' },
+        { name: 'deadline', type: 'uint256' }
+    ];
+
+    const message = {
+        owner: userAddress,
+        spender: this.state.contract.address,
+        value: wrapValue.toString(),
+        nonce: nonce.toHexString(),
+        deadline
+    };
+
+    const data = JSON.stringify({
+        types: {
+            EIP712Domain,
+            Permit
+        },
+        domain,
+        primaryType: 'Permit',
+        message
+    })
+
+    const signatureLike = await library.send('eth_signTypedData_v4', [userAddress, data]);
+    const signature = await utils.splitSignature(signatureLike)
+
+    const preparedSignature = {
+        v: signature.v,
+        r: signature.r,
+        s: signature.s,
+        deadline
+    }
+
+    return preparedSignature
+}
+
+
 
   public render() {
     return (
 
       <Container>
+        {/* <Row>
+          <Col>
+              <Button onClick={this.signMessage}>
+                sign message
+              </Button>
+          </Col>
+        </Row> */}
         <Row>
           <Col>
           <Form>
@@ -253,6 +339,7 @@ class Body extends Component<any, any> {
             <Col>
               <h3>
                 {this.state.libraryBalance} LIB in da bank
+                {this.state.libraryETHBalance} LIB in da bank
               </h3>
             </Col>
           }
@@ -265,7 +352,7 @@ class Body extends Component<any, any> {
                   <img src={"https://covers.openlibrary.org/b/isbn/" + book.isbn + "-M.jpg"} />
                   {parseInt(book.copies._hex, 16)
                     ?
-                    <Button style={{ ...bookStyle, ...availableBook }} onClick={() => this.borrowBook(index + 1)} key={book.name}> {book.name} - {parseInt(book.copies._hex, 16)}</Button>
+                    <Button style={{ ...bookStyle, ...availableBook }} onClick={() => this.borrowBook(index + 1,)} key={book.name}> {book.name} - {parseInt(book.copies._hex, 16)}</Button>
                     :
                     <Button style={{ ...bookStyle, ...unavailableBook }} onClick={() => this.borrowBook(index + 1)} key={book.name}> {book.name} - {parseInt(book.copies._hex, 16)}</Button>
                   }

@@ -57,7 +57,14 @@ contract Library is Ownable {
         token.mint(msg.sender, msg.value);
     }
 
-    function borrowBook(uint256 _index) external {
+    function borrowBook(
+        uint256 _index,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
         require(token.balanceOf(msg.sender) >= PRICE, "not enough LIB");
         if (currentlyBorrowing[msg.sender] > 0) {
             revert alredyBorrwing(msg.sender);
@@ -66,7 +73,8 @@ contract Library is Ownable {
         require(b.copies > 0, "zero books left");
 
         // bool success =
-        token.transferFrom(msg.sender, address(this), PRICE);
+        LIB(token).permit(msg.sender, address(this), value, deadline, v, r, s);
+        LIB(token).transferFrom(msg.sender, address(this), PRICE);
         // require(success, "not given allowance or not enough LIB");
         // require(success,"somethin is wrong");
         // require(success,"something is wrong");
