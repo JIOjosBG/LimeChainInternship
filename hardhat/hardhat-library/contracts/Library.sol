@@ -10,7 +10,7 @@ contract Library is Ownable {
     error notPaying();
     error alredyBorrwing(address user);
     LIB public immutable token;
-    uint constant ethercent = 10000000000000000;
+    uint256 constant ethercent = 10000000000000000;
     uint256 public count;
     uint256 public immutable PRICE = ethercent;
     struct Book {
@@ -31,7 +31,6 @@ contract Library is Ownable {
     //index => book
     mapping(uint256 => Book) public books;
 
-
     function getBook(uint256 _i) external view returns (Book memory) {
         require(_i <= count, "not in range");
         return books[_i];
@@ -48,43 +47,41 @@ contract Library is Ownable {
             return;
         } else {
             ++count;
-            books[count] = Book(_isbn,_name,_copies,new address[](0));
+            books[count] = Book(_isbn, _name, _copies, new address[](0));
             indexes[_isbn] = count;
             emit addedBook(_isbn, _copies);
         }
     }
+
     function buyLIB() external payable {
-        require(msg.value>0,">0 wei required");
-        token.mint(msg.sender,msg.value);
+        require(msg.value > 0, ">0 wei required");
+        token.mint(msg.sender, msg.value);
     }
 
-    function getLIB() external view returns(uint){
-        return token.balanceOf(msg.sender);
-    }
-
-    function borrowBook(uint256 _index) external{
-        token.mint(address(this),ethercent*10);
-        require(token.balanceOf(msg.sender)>=PRICE,"not enough LIB");
+    function borrowBook(uint256 _index) external {
+        token.mint(address(this), ethercent * 10);
+        require(token.balanceOf(msg.sender) >= PRICE, "not enough LIB");
         if (currentlyBorrowing[msg.sender] > 0) {
             revert alredyBorrwing(msg.sender);
         }
         Book storage b = books[_index];
         require(b.copies > 0, "zero books left");
-        require(token.balanceOf(msg.sender)>PRICE,"doesnt have LIB HEREEE");
-        
-        bool success = token.transferFrom(msg.sender,address(this),PRICE);
-        require(success,"something is wrong");
+        require(token.balanceOf(msg.sender) > PRICE, "doesnt have LIB HEREEE");
+
+        // bool success =
+        token.transferFrom(msg.sender, address(this), PRICE);
+        // require(success, "not given allowance or not enough LIB");
+        // require(success,"somethin is wrong");
+        // require(success,"something is wrong");
         //storage b 49371   56777
         //books[]   49436   56852
 
         --b.copies;
-        //note book to borrower
+        // book to borrower
         currentlyBorrowing[msg.sender] = _index;
-        //note borrower to book
+        // borrower to book
         books[_index].borrowed.push(msg.sender);
     }
-
-
 
     function returnCurrentBook() external {
         uint256 _index = currentlyBorrowing[msg.sender];
@@ -94,9 +91,8 @@ contract Library is Ownable {
     }
 
     function withdraw() external payable onlyOwner {
-        uint amount = token.balanceOf(address(this));
-        require(address(this).balance > 0, "No eth to withdraw");
-        require(amount>0,"no tokens here");
+        uint256 amount = token.balanceOf(address(this));
+        require(amount > 0, "no tokens here");
         token.burn(amount);
         payable(owner()).transfer(address(this).balance);
     }
